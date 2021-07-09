@@ -7,6 +7,42 @@
 
 require ABSPATH . WPINC . '/option.php';
 
+if( !class_exists( 'MyAngelmdAPI' ) ) {
+
+class MyAngelmdAPI {
+  function __construct() {
+    add_action( 'rest_api_init', [$this, 'init'] );
+  }
+
+  function init() {
+    register_rest_route( 'angelmd/v1', '/emails', [
+      'methods' => 'POST',
+      'callback' => [$this, 'save_emails']
+    ] );
+  }
+
+  // Save emails
+  function save_emails( $request ) {
+    // Get sent data and save default value
+
+    // print_r($request['email']);
+
+		global $wpdb;
+	  $table_name = $wpdb->prefix.'angelmd_emails';
+
+	  $email = $request['email'];
+	  // $date = date('Y-m-d H:i:s');
+	  $wpdb->insert($table_name, array('email' => $email));
+
+		$current_object_id = $wpdb->insert_id;
+
+    return ( $current_object_id );
+  }
+}
+
+new MyAngelmdAPI();
+}
+
 /**
  * Convert given MySQL date string into a different format.
  *
