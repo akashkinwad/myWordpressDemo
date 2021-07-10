@@ -23,20 +23,28 @@ class MyAngelmdAPI {
 
   // Save emails
   function save_emails( $request ) {
-    // Get sent data and save default value
+    // Check api key from headers
+    $apiKey = $_SERVER['HTTP_X_API_KEY'];
 
-    // print_r($request['email']);
+  	if ( $apiKey == 'jfe@io27cxiqw!9a8o' ) {
+			global $wpdb;
 
-		global $wpdb;
-	  $table_name = $wpdb->prefix.'angelmd_emails';
+		  $table_name = $wpdb->prefix.'angelmd_emails';
+		  $email = $request['email'];
 
-	  $email = $request['email'];
-	  // $date = date('Y-m-d H:i:s');
-	  $wpdb->insert($table_name, array('email' => $email));
+		  // Check if email is blank
+	  	if ( empty( $email ) ) {
+				return new WP_Error( 'forbidden_access', "Email can't be empty", array( 'status' => 403 ) );
+			}
 
-		$current_object_id = $wpdb->insert_id;
+			// Insert email to database
+		  $wpdb->insert($table_name, array('email' => $email));
+			$current_object_id = $wpdb->insert_id;
 
-    return ( $current_object_id );
+	    return ( $current_object_id );
+		} else {
+			return new WP_Error( 'forbidden_access', 'Access denied', array( 'status' => 403 ) );
+		}
   }
 }
 
